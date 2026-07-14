@@ -97,3 +97,26 @@ class TabelaGstuResponse(TabelaGstuSchema):
             }
         }
     )
+
+
+class TabelaComissaoSchema(BaseModel):
+    simbolo: str = Field(min_length=1, max_length=10, description="Símbolo da comissão (ex: DAS-1)")
+    valor_comissao: Decimal = Field(gt=Decimal("0.00"), description="Valor do comissionamento")
+    data_inicio_vigencia: date = Field(description="Data de início da vigência")
+    data_fim_vigencia: date = Field(default=date(9999, 12, 31), description="Data de fim da vigência")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "simbolo": "DAS-1",
+                "valor_comissao": "3500.00",
+                "data_inicio_vigencia": "2026-01-01",
+                "data_fim_vigencia": "9999-12-31"
+            }
+        }
+    }
+
+
+class TabelaComissaoResponse(TabelaComissaoSchema):
+    id: UUID
+    model_config = ConfigDict(from_attributes=True)

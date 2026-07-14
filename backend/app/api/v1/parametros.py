@@ -10,6 +10,7 @@ from app.schemas.parametros import (
     TabelaVencimentoResponse,
     TabelaGstuSchema,
     TabelaGstuResponse,
+    TabelaComissaoResponse,
 )
 from app.schemas.errors import HTTP_400_RESPONSE, HTTP_401_RESPONSE, HTTP_403_RESPONSE, HTTP_422_RESPONSE
 from app.services import parametros as parametros_service
@@ -162,4 +163,27 @@ async def listar_tabela_gstu(
     Acesso permitido a todos os usuários autenticados.
     """
     tabelas = await parametros_service.listar_tabela_gstu(db=db, skip=skip, limit=limit)
+    return tabelas
+
+
+@router.get(
+    "/comissao",
+    response_model=list[TabelaComissaoResponse],
+    summary="Listar referências de comissão",
+    description="Retorna todas as comissões cadastradas com paginação. Permite acesso a qualquer usuário autenticado.",
+    responses={
+        401: HTTP_401_RESPONSE
+    }
+)
+async def listar_tabela_comissao(
+    skip: int = 0,
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """
+    Retorna a tabela de referência de comissões cadastrada com paginação.
+    Acesso permitido a todos os usuários autenticados.
+    """
+    tabelas = await parametros_service.listar_tabela_comissao(db=db, skip=skip, limit=limit)
     return tabelas

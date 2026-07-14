@@ -278,6 +278,14 @@ async def test_fluxo_completo_simulacao_impacto(db_session: AsyncSession, auth_h
         res_json = data_post["resultado_calculo_json"]
         assert abs(res_json["impacto_financeiro_bruto"] - 1570.00) < 0.01
         assert abs(res_json["percentual_impacto"] - 21.715) < 0.1
+        
+        # Novas asserções do Motor de Cálculo
+        assert abs(res_json["impacto_transicao"] - 1570.00) < 0.01
+        assert abs(res_json["impacto_13"] - 1570.00) < 0.01
+        assert abs(res_json["impacto_ferias"] - 523.33) < 0.01
+        assert abs(res_json["impacto_anual_primeiro_ano"] - 20933.33) < 0.01
+        assert res_json["retroativo_total"] > 0
+        assert len(res_json["detalhes_retroativos"]) > 0
 
         # 4. Act & Assert: Buscar a simulação via GET
         sim_id = data_post["id"]

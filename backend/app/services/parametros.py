@@ -3,7 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.tabelas import TabelaVencimento, TabelaGstu
+from app.models.tabelas import TabelaVencimento, TabelaGstu, TabelaComissao
 from app.models.simulacao import AuditLog, OperacaoLog
 from app.schemas.parametros import TabelaVencimentoSchema, TabelaGstuSchema
 
@@ -65,20 +65,6 @@ async def criar_tabela_vencimento(
     )
 
     db.add(nova_tabela)
-    await db.flush()  # Obtém o ID gerado sem fazer commit completo ainda
-
-    # Registra trilha de auditoria
-    audit_log = AuditLog(
-        usuario_id=usuario_id,
-        tabela_afetada="tabela_vencimento",
-        registro_id=nova_tabela.id,
-        operacao=OperacaoLog.INSERT,
-        payload_antigo=None,
-        payload_novo=serialize_for_audit(nova_tabela),
-        ip_origem=ip_origem,
-    )
-    db.add(audit_log)
-    
     await db.commit()
     await db.refresh(nova_tabela)
     return nova_tabela
@@ -130,20 +116,6 @@ async def criar_tabela_gstu(
     )
 
     db.add(nova_gstu)
-    await db.flush()  # Obtém o ID gerado sem fazer commit completo ainda
-
-    # Registra trilha de auditoria
-    audit_log = AuditLog(
-        usuario_id=usuario_id,
-        tabela_afetada="tabela_gstu",
-        registro_id=nova_gstu.id,
-        operacao=OperacaoLog.INSERT,
-        payload_antigo=None,
-        payload_novo=serialize_for_audit(nova_gstu),
-        ip_origem=ip_origem,
-    )
-    db.add(audit_log)
-
     await db.commit()
     await db.refresh(nova_gstu)
     return nova_gstu
@@ -154,5 +126,14 @@ async def listar_tabela_gstu(db: AsyncSession, skip: int = 0, limit: int = 50) -
     Lista registros da tabela GSTU com paginação.
     """
     stmt = select(TabelaGstu).offset(skip).limit(limit)
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+async def listar_tabela_comissao(db: AsyncSession, skip: int = 0, limit: int = 50) -> list[TabelaComissao]:
+    """
+    Lista registros da tabela de comissão com paginação.
+    """
+    stmt = select(TabelaComissao).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return list(result.scalars().all())
