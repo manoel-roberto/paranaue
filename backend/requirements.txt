@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+asyncpg
+pytest
+pytest-asyncio
+httpx
+alembic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+reportlab
+pydantic-settings
